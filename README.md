@@ -1,4 +1,4 @@
-# PA2 - Hashing and Passwords: Due 10/25 at 10pm
+# PA2 - Hashing and Passwords: Due 10/25 at 10pm - [Github Classroom Link](https://classroom.github.com/a/Lo9vRhLG)
 
 [Cryptographic hash functions](https://en.wikipedia.org/wiki/Cryptographic_hash_function) take an input of arbitrary length and produces a fixed length output. The special features are that the outputs are *deterministic* (the same input always generates the same output) and yet the outputs are apparently “random” – two similar inputs are likely to produce very different outputs, and it's difficult to determine the input by looking at the ouput.
 
@@ -11,6 +11,8 @@ In some cases, password cracking can [exploit the structure](https://en.wikipedi
 
 ## Getting Started
 To get started, visit the [Github Classroom](https://classroom.github.com/a/Lo9vRhLG) assignment link. Select your username from the list (or if you don't see it, you can skip and use your Github username). A repository will be created for you to use for your work. This PA should be completed on the `ieng6` server. Refer [this](https://ucsd-cse29.github.io/fa24/week1/index.html#logging-into-ieng6) section in Week 1's Lab for instructions on logging in to your account on `ieng6` and working with files on the server.
+
+**Note** - The autograder uses the C11 standard of the C programming language.
 
 ## Overall Task
 
@@ -85,10 +87,16 @@ Did not find a matching password
 
 To help testing your PA, we are providing you with a file containing 3 million real paintext passwords famously found a data breach of the [RockYou
 social network](https://en.wikipedia.org/wiki/RockYou) in 2009. You can use the password file present in the `ieng6` servers by reading it into `pwcrack` using
-the following commandline.
+the following commandline if you're in Joe's section:
 ```
-$./pwcrack < /home/linux/ieng6/cs29fa24/pa2/rockyou_clean.txt
+$./pwcrack a2c3b02cb22af83d6d1ead1d4e18d916599be7c2ef2f017169327df1f7c844fd < /home/linux/ieng6/cs29fa24/pa2/rockyou_clean.txt
 ```
+
+and the following command if you're in Aaron's section:
+```
+$./pwcrack a2c3b02cb22af83d6d1ead1d4e18d916599be7c2ef2f017169327df1f7c844fd < /home/linux/ieng6/cs29fa24b/pa2/rockyou_clean.txt
+```
+
 
 Note: these are real human-generated passwords, so they may contain profane words (and offensive concepts). We are providing a
 censored version of the RockYou password list. Our filtering methodology was to remove any passwords that matched a widely-used 2,800 profane
@@ -187,14 +195,14 @@ assert(hex_to_byte('1', '0') == 16);
 #### `hexstr_to_hash`
 
 ```
-void hexstr_to_hash(unsigned char hexstr[], char hash[32])
+void hexstr_to_hash(char hexstr[], unsigned char hash[32])
 ```
 
 Given 64 hex characters in ASCII (e.g. user input), convert it to a 32-byte array corresponding to the hex values. Assume the first 64 bytes (exactly) of hex contain the input data.
 
 ```
 char hexstr[64] = "a2c3b02cb22af83d6d1ead1d4e18d916599be7c2ef2f017169327df1f7c844fd";
-char hash[32];
+unsigned char hash[32];
 hexstr_to_hash(hexstr, hash);
 // hash should now contain { 0xa2, 0xc3, 0xb0, 0x2c, ... }
 ```
@@ -208,10 +216,10 @@ For example:
 
 ```
 int main(int argc, char** argv) {
-  char hash[32];
+  unsigned char hash[32];
   hexstr_to_hash(argv[1], hash);
   printf("User input as hash: \n");
-  // print out hash (you can use our main method from the SHA256 example
+  // print out hash (you can use our main method from the SHA256 example)
 }
 ```
 
@@ -225,12 +233,12 @@ A way to organize this in your code could be to write individual test functions,
 #include <assert.h>
 
 void test_hex_to_byte() {
-  assert(hex_to_byte('c', '8') == 201)
+  assert(hex_to_byte('c', '8') == 200)
   ...
 }
 void test_hexstr_to_hash() {
   char hexstr[64] = "a2c3b02cb22af83d6d1ead1d4e18d916599be7c2ef2f017169327df1f7c844fd";
-  char hash[32];
+  unsigned char hash[32];
   hexstr_to_hash(hexstr, hash);
   for(int i = 0; i < 32; i += 1) { ... print something about hash ... }
   assert(hash[0] == 0xa2);
@@ -242,7 +250,7 @@ int main(int argc, char** argv) {
     test_hex_to_byte();
     test_hexstr_to_hash();
   }
-  char hash[32];
+  unsigned char hash[32];
   hexstr_to_hash(argv[1], hash);
   // ... other work in main ...
 }
@@ -258,11 +266,11 @@ Given a password as a C string and a SHA256 hash as an array of bytes, check the
 
 
 ```
-int8_t check_password(char password[], char given_hash[32])
+int8_t check_password(char password[], unsigned char given_hash[32])
 
 // Example:
 // char hash_as_hexstr[] = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"; // SHA256 hash for "password"
-// char given_hash[32];
+// unsigned char given_hash[32];
 // hexstr_to_hash(hash_as_hexstr, given_hash);
 // assert(check_password("password", given_hash) == 1);
 // assert(check_password("wrongpass", given_hash) == 0);
@@ -300,7 +308,7 @@ For testing milestone 2, using `assert`s in a test function (as suggested in Mil
 #### `crack_password`
 
 ```
-int8_t crack_password(char password[], char given_hash[])
+int8_t crack_password(char password[], unsigned char given_hash[])
 ```
 
 Given a password string and hash, attempt to match the given password and all variations of the given password made by uppercasing or lowercasing a single ASCII character.
@@ -310,7 +318,7 @@ Returns `1` on match and `0` if no match. In addition, if `1` is returned, the `
 ```
 // char password[] = "paSsword";
 // char hash_as_hexstr[] = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"; // SHA256 hash of "password"
-// char given_hash[32];
+// unsigned char given_hash[32];
 // hexstr_to_hash(hash_as_hexstr, given_hash);
 // int8_t match = crack_password(password, given_hash);
 // assert(match == 1);
