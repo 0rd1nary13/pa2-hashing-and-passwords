@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    unsigned char given_hash[SHA_LENGTH];
+    unsigned char given_hash[32];
     hexstr_to_hash(argv[1], given_hash);
 
     char password[256];
