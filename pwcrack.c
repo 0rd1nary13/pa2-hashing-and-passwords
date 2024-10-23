@@ -26,7 +26,7 @@ uint8_t hex_to_byte(unsigned char h1, unsigned char h2) {
     return (h1 << 4) | h2;
 }
 
-void hexstr_to_hash(unsigned char hexstr[], char hash[32]) {
+void hexstr_to_hash(const unsigned char hexstr[], char hash[32]) {
 	for (int i = 0; i < 32; i += 1) {
         hash[i] = hex_to_byte(hexstr[i * 2], hexstr[i * 2 + 1]);
     }
@@ -58,17 +58,44 @@ int8_t check_password(char password[], char given_hash[32]) {
     return memcmp(computed_hash, given_hash, 32) == 0;
 }
 
+int8_t crack_password(char password[], unsigned char given_hash[]){
+	if (check_password(password, given_hash)) {
+        return 1;
+    }
+
+    int length = strlen(password);
+    for (int i = 0; i < length; i++) {
+        char original = password[i];
+        if (original >= 'a' && original <= 'z') {
+            password[i] = original - 'a' + 'A';
+        } else if (original >= 'A' && original <= 'Z') {
+            password[i] = original - 'A' + 'a';
+        } else {
+            continue;
+        }
+
+        if (check_password(password, given_hash)) {
+            return 1;
+        }
+        password[i] = original;
+    }
+    return 0;
+}
+
 const int testing = 1;
 
 int main(int argc, char** argv) {
         unsigned char hash[32];
         hexstr_to_hash(argv[1], hash);
     char hash_as_hexstr[] = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"; // SHA256 hash for "password"
-    char given_hash[32];
+    unsigned char given_hash[32];
     hexstr_to_hash(hash_as_hexstr, given_hash);
-    assert(check_password("password", given_hash) == 0);
+    assert(check_password("password", given_hash) == 1);
     assert(check_password("wrongpass", given_hash) == 0);
-
+    char password[] = "paSsword";
+    int8_t match = crack_password(password, given_hash);
+    assert(match == 1);
+    assert(password[2] == 's'); // the uppercase 'S' has been lowercased
     return 0;
 }
 
