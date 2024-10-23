@@ -51,20 +51,23 @@ void test_hexstr_to_hash() {
     assert(hash[31] == 0xfd);
 }
 
+//m2
+int8_t check_password(char password[], char given_hash[32]) {
+    unsigned char computed_hash[32];
+    SHA256((unsigned char*)password, strlen(password), computed_hash);
+    return memcmp(computed_hash, given_hash, 32) == 0;
+}
+
 const int testing = 1;
 
 int main(int argc, char** argv) {
         unsigned char hash[32];
         hexstr_to_hash(argv[1], hash);
-        printf("User input as hash:\n");
-        for (int i = 0; i < 32; i++) {
-            printf("%02x", hash[i]);
-        }
-        printf("\n");     
-	if (testing) {
-        	test_hex_to_byte();
-        	test_hexstr_to_hash();
-    }
+    char hash_as_hexstr[] = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"; // SHA256 hash for "password"
+    char given_hash[32];
+    hexstr_to_hash(hash_as_hexstr, given_hash);
+    assert(check_password("password", given_hash) == 0);
+    assert(check_password("wrongpass", given_hash) == 0);
 
     return 0;
 }
