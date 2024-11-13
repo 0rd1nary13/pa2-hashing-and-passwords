@@ -79,6 +79,24 @@ int8_t crack_password(char password[], unsigned char given_hash[]){
         }
         password[i] = original;
     }
+
+    for (int i = 0; i < length; i++) {
+        char original = password[i];
+        if (original >= '0' && original <= '9') {
+            for (char new_digit = '0'; new_digit <= '9'; new_digit++) {
+                if (new_digit == original) {
+                    continue;
+                }
+                password[i] = new_digit;
+
+                if (check_password(password, given_hash)) {
+                    return 1;
+                }
+            }
+            password[i] = original;
+        }
+    }
+
     return 0;
 }
 
@@ -113,4 +131,3 @@ int main(int argc, char** argv) {
 
     return 0;
 }
-
