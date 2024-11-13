@@ -1,5 +1,13 @@
-Answer1:
-User usually usign substitutions—replacing to make their passwords more unhackable. Letters with similar-looking numbers or symbols like 'E' with '3' or 'A' with '4'—and appending or prepending common numbers or symbols such as '123', '!', or '@';  If we want to crack them, we can create mappings for leet equivalents and lists of common prefixes and suffixes, then generate password variations by applying these transformations to the original password.
+1.How many password variations were hashed and tested for a match?
+secret118: 
+We cange the case for every letters in the words, then we change the number from 0-9. It means we have to 6 for letters change, 9 for numbers changes. So it end up with 6 + 3*9 = 33 conbinaiton. 
+secret111:
+Same for this one. 
 
-Answer2:
-In my program, I used memory less than the CPU. Because the working memory needed to execute the password cracker is relatively low when generating password variations on the fly—minimizing memory usage—and since the primary bottleneck is the time it takes to process and compare each password attempt, a password cracker is more limited by processing speed than by memory. 
+2.How many duplicate password variations were hashed and checked?
+Total unique password variations: 1 (original) + 6 (case variations) + 27 (digit variations) = 34.
+Total password checks considering redundancy: 1 + 6 + 6 * 27 = 163.
+Total number of duplicates: 163 - 34 = 129 duplicate password checks.
+
+3.What are ways you might change your implementation to avoid this repeated and redundant work?
+We can implement a single loop that handles both modifications in a systematic manner to avoid overlaps. 
